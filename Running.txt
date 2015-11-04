@@ -1,0 +1,183 @@
+Group member: Jian Jin
+
+Put the search.py and searchAgents.py into the original folder. The result of autograder is below:
+python autograder.py
+
+Provisional grades
+==================
+Question q1: 3/3
+Question q2: 3/3
+Question q3: 3/3
+Question q4: 3/3
+Question q5: 3/3
+Question q6: 3/3
+Question q7: 3/4
+
+For Question q7, if using foodHeuristic the score will be 3/4, if using foodHeuristcMaze the score will be 5/4. Further details are in the part of "Grad. foodHeuristic" below. No modification that weren’t expliitly asked for is made.
+
+For search algorithms, I use dictonary EdgeSet to construct the action output. The key is the state, and the value is the state and action of the parant node's. 
+
+Result and solutions
+----- 1. DFS -----
+python pacman.py -l tinyMaze -p SearchAgent -a fn=dfs
+Search nodes expanded: 15
+Pacman emerges victorious! Score: 500
+
+mediumMaze:
+Search nodes expanded: 146
+Pacman emerges victorious! Score: 380
+
+bigMaze:
+Search nodes expanded: 390
+Pacman emerges victorious! Score: 300
+
+openMaze:
+Search nodes expanded: 806
+Pacman emerges victorious! Score: 212
+
+----- 2. BFS -----
+python pacman.py -l tinyMaze -p SearchAgent -a fn=bfs
+Search nodes expanded: 15
+Pacman emerges victorious! Score: 502
+
+mediumMaze:
+Search nodes expanded: 269
+Pacman emerges victorious! Score: 442
+
+bigMaze:
+Search nodes expanded: 620
+Pacman emerges victorious! Score: 300
+
+openMaze:
+Search nodes expanded: 682
+Pacman emerges victorious! Score: 456
+
+----- Grad. IDS -----
+python pacman.py -l tinyMaze -p SearchAgent -a fn=ids
+Search nodes expanded: 93
+Pacman emerges victorious! Score: 500
+
+python pacman.py -l mediumMaze -p SearchAgent -a fn=ids
+Search nodes expanded: 8203
+Pacman emerges victorious! Score: 442
+
+python pacman.py -l bigMaze -p SearchAgent -a fn=ids
+Search nodes expanded: 60419
+Pacman emerges victorious! Score: 300
+
+python pacman.py -l openMaze -p SearchAgent -a fn=ids
+Search nodes expanded: 38116
+Pacman emerges victorious! Score: 394
+
+----- 3. UCS -----
+python pacman.py -l mediumMaze -p SearchAgent -a fn=ucs
+Search nodes expanded: 269
+Pacman emerges victorious! Score: 442
+
+python pacman.py -l mediumDottedMaze -p StayEastSearchAgent
+Search nodes expanded: 186
+Pacman emerges victorious! Score: 646
+
+python pacman.py -l mediumScaryMaze -p StayWestSearchAgent
+Search nodes expanded: 108
+Pacman emerges victorious! Score: 418
+
+---- Grad. costFn -----
+I use StayDiagonalSearchAgent. It is intuitive to make agents tend to go through diagonal line of layouts for less node expansion. In StayDiagonalSearchAgent, cost function is 
+
+costFn = lambda pos: 2 ** abs(1.05 * pos[1] - pos[0])
+
+python pacman.py -l openMaze -p StayDiagonalSearchAgent -z 0.5
+Search nodes expanded: 233
+Pacman emerges victorious! Score: 452
+
+python pacman.py -l mediumMaze -p StayDiagonalSearchAgent -z 0.5
+Search nodes expanded: 195
+Pacman emerges victorious! Score: 408
+
+python pacman.py -l tinyMaze -p StayDiagonalSearchAgent -z 0.5
+Search nodes expanded: 12
+Pacman emerges victorious! Score: 502
+
+python pacman.py -l bigMaze -p StayDiagonalSearchAgent -z 0.5
+Search nodes expanded: 581
+Pacman emerges victorious! Score: 300
+
+This makes the agent tend to go through diagonal line of the layout to reach the goal. It has obvious effect on path of mediumMaze and openMaze where the number of node expansion is reduced. It fails the mediumDottedMaze because it does not go south from the starting point. It could win the mediumScaryMaze. 
+
+Compare with this:
+python pacman.py -l openMaze -p SearchAgent -a fn=ucs -z 0.5
+Search nodes expanded: 682
+Pacman emerges victorious! Score: 456
+
+Number of node expansion is reduced by using stayDiagonalSearchAgent.
+
+----- 4. A star -----
+python pacman.py -l tinyMaze -z .5 -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic
+Search nodes expanded: 14
+Pacman emerges victorious! Score: 502
+
+python pacman.py -l mediumMaze -z .5 -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic
+Search nodes expanded: 222
+Pacman emerges victorious! Score: 442
+
+python pacman.py -l bigMaze -z .5 -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic
+Search nodes expanded: 549
+Pacman emerges victorious! Score: 300
+
+python pacman.py -l openMaze -z .5 -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic
+Search nodes expanded: 535
+Pacman emerges victorious! Score: 456
+
+----- 5. FindCorners -----
+python pacman.py -l tinyCorners -p SearchAgent -a fn=bfs,prob=CornersProblem
+Search nodes expanded: 252
+Pacman emerges victorious! Score: 512
+
+python pacman.py -l mediumCorners -p SearchAgent -a fn=bfs,prob=CornersProblem
+Search nodes expanded: 1966
+Pacman emerges victorious! Score: 434
+
+----- 6. cornersHeuristic -----
+python pacman.py -l tinyCorners -p AStarCornersAgent -z 0.5
+Search nodes expanded: 154
+Pacman emerges victorious! Score: 512
+
+python pacman.py -l mediumCorners -p AStarCornersAgent -z 0.5
+Search nodes expanded: 692
+Pacman emerges victorious! Score: 434
+
+This works fine with limites node expansion. The heuristic value is the total manhattan distance of the process of going to the closest unvisited corner, then second closest unvisited corner ... until find the last unvisited corner. The implementation is in cornersHeuristic(state, problem) of searchAgents.py
+
+----- 7. EatingAll -----
+python pacman.py -l testSearch -p SearchAgent -a fn=astar,prob=FoodSearchProblem,heuristic=nullHeuristic
+Search nodes expanded: 14
+Pacman emerges victorious! Score: 513
+
+python pacman.py -l trickySearch -p SearchAgent -a fn=astar,prob=FoodSearchProblem,heuristic=nullHeuristic
+Search nodes expanded: 16688
+Pacman emerges victorious! Score: 570
+
+---- Grad. foodHeuristic -----
+python pacman.py -l testSearch -p AStarFoodSearchAgent
+Search nodes expanded: 12
+Pacman emerges victorious! Score: 513
+
+python pacman.py -l trickySearch -p AStarFoodSearchAgent
+Search nodes expanded: 9928
+Pacman emerges victorious! Score: 570
+
+The heuristic value is the manhattan distance of going to the food with the greatest manhattan distance. The implementation is in foodHeuristic(state, problem) of searchAgent.py
+
+One could use mazeDistance (the last given function in searchAgents.py) to replace the manhattan distance here. It will expand much less nodes but takes very long time. I think using mazeDistance loses the point of heuristics because it is an accurate distance. This is named foodHeuristicMaze in my implementation. Following is the result:
+
+python pacman.py -l trickySearch -p SearchAgent -a fn=astar,prob=FoodSearchProblem,heuristic=foodHeuristicMaze
+Path found with total cost of 60 in 35.1 seconds
+Search nodes expanded: 4239
+Pacman emerges victorious! Score: 570
+
+In searchAgents.py, foodHeuristic uses the manhattan distance, foodHeuristcMaze uses mazeDistance which is computed by bfs. 
+
+Regard the food with the largest manhattan distance from the current node as the goal. Other foods are eaten in the process of reaching the goal. If there are no obstacles, the shortest path between current point and this food will be at least the manhattan distance between these two points (When positions of other foods' do not cause deviation from the path with this manhatttan distance, the length of the shortest path will be the manhattan distance, otherwise it will be largen than manhattan distance). If there are obstacles the shortset path is at least the one when there are no obstacles. So this heuristic function will not overestimate the cost of reaching the goal, thus admissible.
+
+mazeDistance uses the shortest distance computed by bfs. So it is also admissible. 
